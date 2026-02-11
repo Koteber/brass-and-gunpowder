@@ -1,20 +1,21 @@
 {
   "schemaVersion": 1,
-  "id": "template",
+  "id": "brassandgunpowder",
   "version": "${version}",
 
-  "name": "Template",
-  "description": "",
+  "name": "Brass and Gunpowder",
+  "description": "Adds GUNS. like we are talking BIG WEAPONRY here.",
   "authors": [
-    "DanyGames2014"
+    "Kote"
   ],
 
   "license": "MIT",
-  "icon": "assets/template/icon.png",
+  "icon": "assets/brassandgunpowder/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "stationapi:event_bus": [
+      "io.github.koteber.brassandgunpowder.BaG"
     ],
     "stationapi:event_bus_client": [
     ],
@@ -22,7 +23,7 @@
     ]
   },
   "mixins": [
-    "template.mixins.json"
+    "brassandgunpowder.mixins.json"
   ],
 
   "depends": {

@@ -1,6 +1,7 @@
 package io.github.koteber.brassandgunpowder.mixin.client;
 
 import io.github.koteber.brassandgunpowder.BaG;
+import io.github.koteber.brassandgunpowder.items.WeaponBase;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -34,24 +35,29 @@ public abstract class InGameHudMixin extends DrawContext {
             ),
             cancellable = true
     )
-    public void brassAndGunpowder_renderScore(float tickDelta, boolean screenOpen, int mouseX, int mouseY, CallbackInfo ci) {
-        if (this.minecraft.player.health > 0 && !this.minecraft.options.debugHud && BaG.reloadHudState) {
-            ScreenScaler screenScaler = new ScreenScaler(this.minecraft.options, this.minecraft.displayWidth, this.minecraft.displayHeight);
-            int centerX = screenScaler.getScaledWidth() / 2;
-            int centerY = screenScaler.getScaledHeight() / 2;
-
-            int textureId = this.minecraft.textureManager.getTextureId("/assets/brassandgunpowder/gui/reloadScreen.png");
-            this.minecraft.textureManager.bindTexture(textureId);
-            this.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
-
-            ArrayList<Rectangle> zones = BaG.getDrawZones();
-            for (Rectangle zone : zones) {
-                this.minecraft.textureManager.bindTexture(this.minecraft.textureManager.getTextureId("nothing.png"));
-                this.drawTexture(centerX - (int)zone.getCenterX(), centerY - (int)zone.getCenterY(), 0, 0, zone.width, zone.height);
-            }
+    public void brassAndGunpowder_renderReloadHud(float tickDelta, boolean screenOpen, int mouseX, int mouseY, CallbackInfo ci) {
+        if (minecraft.player.inventory.getSelectedItem() == null) {
+            BaG.isReloading = false;
+            return;
         }
-        else {
-            /* nothing */
+        if (!WeaponBase.class.isAssignableFrom(minecraft.player.inventory.getSelectedItem().getItem().getClass())) {
+            BaG.isReloading = false;
+            return;
         }
+
+        WeaponBase weapon = (WeaponBase) minecraft.player.inventory.getSelectedItem().getItem();
+        BaG.isReloading = weapon.isReloading;
+
+        if (!weapon.isReloading) return;
+
+        ScreenScaler screenScaler = new ScreenScaler(minecraft.options, minecraft.displayWidth, minecraft.displayHeight);
+        int centerX = screenScaler.getScaledWidth() / 2;
+        int centerY = screenScaler.getScaledHeight() / 2;
+
+        int textureId = minecraft.textureManager.getTextureId("/assets/brassandgunpowder/gui/reloadScreen.png");
+        minecraft.textureManager.bindTexture(textureId);
+        drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
+
+        weapon.reloadHandler(tickDelta, screenOpen, centerX, centerY, mouseX, mouseY, minecraft, ci);
     }
 }

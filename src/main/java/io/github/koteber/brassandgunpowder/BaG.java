@@ -36,17 +36,20 @@ public class BaG {
     public static Item[] items;
     public static Item item_LEVER_SHOTGUN;
 
+    //region Reloading
     public static KeyBinding keybind_Reload;
-
     public static boolean keyState_Reload;
+    public static boolean isReloading;
+    //endregion
 
-    private static ArrayList<Rectangle> drawZones = new ArrayList<>();
-    public static void setDrawZones(ArrayList<Rectangle> zones) { drawZones = zones; }
-    public static ArrayList<Rectangle> getDrawZones() { return drawZones; }
+    public static boolean isInsideRectangle(Rectangle rect, float mouseX, float mouseY) {
+        return (mouseX >= rect.getMinX() && mouseX <= rect.getMaxX())
+                && (mouseY >= rect.getMinY() && mouseY <= rect.getMaxY());
+    }
 
     @EventListener
     public void registerItems(ItemRegistryEvent event) {
-        item_LEVER_SHOTGUN = new LeverShotgun(NAMESPACE.id("lever_shotgun")).setTranslationKey(NAMESPACE, "lever_shotgun");
+        item_LEVER_SHOTGUN = new LeverShotgun(NAMESPACE.id("lever_shotgun"), 30).setTranslationKey(NAMESPACE, "lever_shotgun");
 
         items = new Item[]{
                 item_LEVER_SHOTGUN
@@ -55,15 +58,13 @@ public class BaG {
     @Environment(EnvType.CLIENT)
     @EventListener
     public void registerKeybinds(KeyBindingRegisterEvent event) {
-
         keybind_Reload = new KeyBinding("key.brassandgunpowder.reload", Keyboard.KEY_R);
 
         event.keyBindings.add(keybind_Reload);
     }
-
     @Environment(EnvType.CLIENT)
     @EventListener
-    public void handle(KeyStateChangedEvent event) {
+    public void keybindChecker(KeyStateChangedEvent event) {
         String pressedKey = Keyboard.getKeyName(Keyboard.getEventKey());
 
         String reloadKey = Keyboard.getKeyName(keybind_Reload.code);
@@ -71,9 +72,5 @@ public class BaG {
         if (pressedKey.equals(reloadKey)) {
             keyState_Reload = Keyboard.getEventKeyState();
         }
-    }
-    public static boolean reloadHudState;
-    public static void setReloadHudState(boolean bool) {
-        reloadHudState = bool;
     }
 }

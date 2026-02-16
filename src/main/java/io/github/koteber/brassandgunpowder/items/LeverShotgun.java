@@ -1,22 +1,20 @@
 package io.github.koteber.brassandgunpowder.items;
 
 import io.github.koteber.brassandgunpowder.BaG;
+import io.github.koteber.brassandgunpowder.SliderZone;
 import net.glasslauncher.mods.gcapi3.mixin.client.MinecraftAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Mouse;
-import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.util.ScreenScaler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.modificationstation.stationapi.api.template.item.TemplateItem;
 import net.modificationstation.stationapi.api.util.Identifier;
+import org.lwjgl.util.vector.Vector2f;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.awt.*;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class LeverShotgun extends WeaponBase {
@@ -30,6 +28,7 @@ public class LeverShotgun extends WeaponBase {
     public boolean debounce_repositionZones;
 
     public ArrayList<Rectangle> zones = new ArrayList<>();
+    public ArrayList<SliderZone> sliders = new ArrayList<>();
 
     @Override
     public void reloadHandler(float tickDelta, boolean screenOpen, int centerX, int centerY, int mouseX, int mouseY, Minecraft minecraft, CallbackInfo ci) {
@@ -50,8 +49,6 @@ public class LeverShotgun extends WeaponBase {
     }
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-//        BaG.LOGGER.info(getState(stack) + " " + ammo);
-        super.inventoryTick(stack, world, entity, slot, selected);
         if (!selected && isReloading) {
             interruptReloading(stack);
             return;
@@ -97,6 +94,14 @@ public class LeverShotgun extends WeaponBase {
         zones.add(new Rectangle(0,-75, 25,25));
         zones.add(new Rectangle(75,0, 25,25));
         zones.add(new Rectangle(-75,0, 25,25));
+
+        sliders.clear();
+
+        ArrayList<Vector2f> points = new ArrayList<>();
+        points.add(new Vector2f(-100, 100));
+        points.add(new Vector2f(-100, -100));
+
+        sliders.add(new SliderZone(points, 15));
 
         ScreenScaler screenScaler = new ScreenScaler(MinecraftAccessor.getInstance().options, MinecraftAccessor.getInstance().displayWidth, MinecraftAccessor.getInstance().displayHeight);
         int centerX = screenScaler.getScaledWidth() / 2;

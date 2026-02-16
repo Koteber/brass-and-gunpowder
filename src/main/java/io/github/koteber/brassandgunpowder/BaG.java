@@ -1,30 +1,19 @@
 package io.github.koteber.brassandgunpowder;
 
 import io.github.koteber.brassandgunpowder.items.LeverShotgun;
-import io.github.koteber.brassandgunpowder.screen.ReloadScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.mine_diver.unsafeevents.listener.EventListener;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.modificationstation.stationapi.api.client.event.keyboard.KeyStateChangedEvent;
 import net.modificationstation.stationapi.api.client.event.option.KeyBindingRegisterEvent;
-import net.modificationstation.stationapi.api.client.gui.screen.GuiHandler;
-import net.modificationstation.stationapi.api.client.registry.GuiHandlerRegistry;
-import net.modificationstation.stationapi.api.event.registry.GuiHandlerRegistryEvent;
 import net.modificationstation.stationapi.api.event.registry.ItemRegistryEvent;
-import net.modificationstation.stationapi.api.registry.Registry;
-import net.modificationstation.stationapi.api.template.item.TemplateItem;
-import net.modificationstation.stationapi.api.util.Identifier;
 import net.modificationstation.stationapi.api.util.Namespace;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 @SuppressWarnings("unused")
 public class BaG {
@@ -41,6 +30,9 @@ public class BaG {
     public static boolean keyState_Reload;
     public static boolean isReloading;
     //endregion
+
+    public static boolean isHoldingLMB;
+
 
     public static boolean isInsideRectangle(Rectangle rect, float mouseX, float mouseY) {
         return (mouseX >= rect.getMinX() && mouseX <= rect.getMaxX())

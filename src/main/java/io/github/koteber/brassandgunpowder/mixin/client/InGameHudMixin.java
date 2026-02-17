@@ -36,8 +36,6 @@ public abstract class InGameHudMixin extends DrawContext {
             cancellable = true
     )
     public void brassAndGunpowder_renderReloadHud(float tickDelta, boolean screenOpen, int mouseX, int mouseY, CallbackInfo ci) {
-        fill(100,100, mouseX, mouseY, 2);
-        drawHorizontalLine(200, 400, 500, 3);
         if (minecraft.player.inventory.getSelectedItem() == null) {
             BaG.isReloading = false;
             return;

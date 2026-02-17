@@ -1,5 +1,6 @@
 package io.github.koteber.brassandgunpowder.items;
 
+import com.mojang.datafixers.TypeRewriteRule;
 import io.github.koteber.brassandgunpowder.BaG;
 import net.glasslauncher.mods.gcapi3.mixin.client.MinecraftAccessor;
 import net.minecraft.client.Minecraft;
@@ -13,6 +14,8 @@ import net.modificationstation.stationapi.api.template.item.TemplateItem;
 import net.modificationstation.stationapi.api.util.Identifier;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
+
 public abstract class WeaponBase extends TemplateItem {
 
     protected Mouse mouse;
@@ -24,6 +27,12 @@ public abstract class WeaponBase extends TemplateItem {
     public String emptyState = "empty";
     public String reloadingState = "reloading";
     public String loadedState = "loaded";
+
+    public enum SequenceDirections {
+        LEFT, RIGHT, UP, DOWN;
+    }
+    public ArrayList<SequenceDirections> sequence = new ArrayList<>();
+
     public WeaponBase(Identifier identifier, int _ammo) {
         super(identifier);
         this.maxCount = 1;

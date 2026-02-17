@@ -33,7 +33,7 @@ public class LeverShotgun extends WeaponBase {
             return;
         }
         if (!BaG.keyState_Reload && debounce_reloadScreen) { debounce_reloadScreen = false; }
-        if (getState(stack).equals("empty")) {
+        if (stack.getDamage() > 0) {
             if (BaG.keyState_Reload && !debounce_reloadScreen) {
                 debounce_reloadScreen = true;
                 reloadZonesInitialize();

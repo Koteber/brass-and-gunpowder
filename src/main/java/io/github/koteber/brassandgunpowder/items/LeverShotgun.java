@@ -23,7 +23,6 @@ public class LeverShotgun extends WeaponBase {
         super(identifier, _ammo);
     }
 
-    private Mouse mouse;
     private float yDelta;
     private float xDelta;
 
@@ -36,32 +35,37 @@ public class LeverShotgun extends WeaponBase {
     public void reloadHandler(float tickDelta, boolean screenOpen, int centerX, int centerY, int mouseX, int mouseY, Minecraft minecraft, CallbackInfo ci) {
         if (!isReloading) return;
 
-        
+        yDelta += mouse.deltaY;
+        xDelta += mouse.deltaX;
+
         if (currentReloadStage == 0) {
             int textureId = minecraft.textureManager.getTextureId("/assets/brassandgunpowder/gui/arrows/up_arrow.png");
             minecraft.textureManager.bindTexture(textureId);
             minecraft.inGameHud.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
+
             if (yDelta >= 25) {
                 yDelta = 0;
                 xDelta = 0;
                 currentReloadStage = 1;
             }
         }
-        if (currentReloadStage == 1) {
+        else if (currentReloadStage == 1) {
             int textureId = minecraft.textureManager.getTextureId("/assets/brassandgunpowder/gui/arrows/down_arrow.png");
             minecraft.textureManager.bindTexture(textureId);
             minecraft.inGameHud.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
-            if (yDelta <= 25) {
+
+            if (yDelta <= -25) {
                 yDelta = 0;
                 xDelta = 0;
                 currentReloadStage = 2;
             }
         }
-        if (currentReloadStage == 2) {
+        else if (currentReloadStage == 2) {
             int textureId = minecraft.textureManager.getTextureId("/assets/brassandgunpowder/gui/arrows/left_arrow.png");
             minecraft.textureManager.bindTexture(textureId);
             minecraft.inGameHud.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
-            if (xDelta <= 25) {
+
+            if (xDelta <= -25) {
                 yDelta = 0;
                 xDelta = 0;
                 currentReloadStage = 0;
@@ -71,7 +75,8 @@ public class LeverShotgun extends WeaponBase {
     }
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        BaG.LOGGER.info(getState(stack) + " / " + isReloading + " / " + BaG.isReloading + " / " + BaG.keyState_Reload + " / " + debounce_reloadScreen);
+//        BaG.LOGGER.info(getState(stack) + " / " + isReloading + " / " + BaG.isReloading + " / " + BaG.keyState_Reload + " / " + debounce_reloadScreen);
+        BaG.LOGGER.info(currentReloadStage + " / " + xDelta + " / " + yDelta);
         super.inventoryTick(stack, world, entity, slot, selected);
         if (!selected && isReloading) {
             interruptReloading(stack);

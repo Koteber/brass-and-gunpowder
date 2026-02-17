@@ -19,8 +19,6 @@ import java.util.ArrayList;
 public abstract class WeaponBase extends TemplateItem {
 
     protected Mouse mouse;
-    public int maxAmmo;
-    public int ammo;
 
     public boolean isReloading;
 
@@ -36,17 +34,14 @@ public abstract class WeaponBase extends TemplateItem {
     public WeaponBase(Identifier identifier, int _ammo) {
         super(identifier);
         this.maxCount = 1;
-        maxAmmo = _ammo;
-        ammo = 0;
-        setMaxDamage(maxAmmo);
+        setMaxDamage(_ammo);
     }
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         if (mouse == null) mouse = MinecraftAccessor.getInstance().mouse;
         if (getState(stack).isEmpty()) {
-            stack.setDamage(maxAmmo);
-            ammo = 0;
+            stack.setDamage(stack.getMaxDamage());
             setState(stack,"empty");
         }
         super.inventoryTick(stack, world, entity, slot, selected);
@@ -70,17 +65,15 @@ public abstract class WeaponBase extends TemplateItem {
         isReloading = false;
         BaG.isReloading = false;
         mouse.lockCursor();
-        ammo = maxAmmo;
         stack.setDamage(0);
         setState(stack, loadedState);
     }
     public void shoot(ItemStack stack, World world, PlayerEntity user) {
-        if ((stack.getDamage() == stack.getMaxDamage()) || (ammo <= 0)) return;
+        if ((stack.getDamage() == stack.getMaxDamage())) return;
         stack.damage(1, user);
         world.playSound(user, "random.bow", 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F));
         world.spawnEntity(new ArrowEntity(world, user));
-        ammo--;
-        if (ammo <= 0) setState(stack, emptyState);
+        if ((stack.getDamage() == stack.getMaxDamage())) setState(stack, emptyState);
     }
     public void setState(ItemStack stack, String state) {
         stack.getStationNbt().putString("state", state);

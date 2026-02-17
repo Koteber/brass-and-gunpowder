@@ -2,6 +2,7 @@ package io.github.koteber.brassandgunpowder.items;
 
 import com.mojang.datafixers.TypeRewriteRule;
 import io.github.koteber.brassandgunpowder.BaG;
+import io.github.koteber.brassandgunpowder.EventPoster;
 import net.glasslauncher.mods.gcapi3.mixin.client.MinecraftAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Mouse;
@@ -32,6 +33,8 @@ public abstract class WeaponBase extends TemplateItem {
         LEFT, RIGHT, UP, DOWN;
     }
     public ArrayList<SequenceDirections> sequence = new ArrayList<>();
+
+    protected EventPoster poster = new EventPoster();
 
     public WeaponBase(Identifier identifier, int _ammo) {
         super(identifier);
@@ -98,6 +101,7 @@ public abstract class WeaponBase extends TemplateItem {
         }
 
         if (sequence.isEmpty()) {
+            poster.postEvent();
             finishReloading(minecraft.player.inventory.getSelectedItem());
         }
     }
@@ -108,6 +112,7 @@ public abstract class WeaponBase extends TemplateItem {
         setState(stack, reloadingState);
     }
     public void interruptReloading(ItemStack stack) {
+        sequence.clear();
         isReloading = false;
         BaG.isReloading = false;
         setState(stack, emptyState);

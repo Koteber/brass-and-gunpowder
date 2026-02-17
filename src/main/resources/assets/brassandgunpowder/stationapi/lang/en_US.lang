@@ -1,3 +1,4 @@
 item.@.lever_shotgun.name = Lever Shotgun
+item.@.revolver.name = Revolver
 
 key.@.reload=Reload

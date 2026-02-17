@@ -19,6 +19,8 @@ import java.util.ArrayList;
 public abstract class WeaponBase extends TemplateItem {
 
     protected Mouse mouse;
+    protected float yDelta;
+    protected float xDelta;
 
     public boolean isReloading;
 
@@ -47,32 +49,82 @@ public abstract class WeaponBase extends TemplateItem {
         super.inventoryTick(stack, world, entity, slot, selected);
     }
 
-    public abstract void reloadHandler(float tickDelta, boolean screenOpen, int centerX, int centerY, int mouseX, int mouseY, Minecraft minecraft, CallbackInfo ci);
+    public void reloadHandler(float tickDelta, boolean screenOpen, int centerX, int centerY, int mouseX, int mouseY, Minecraft minecraft, CallbackInfo ci) {
+        if (!isReloading) return;
+
+        yDelta += mouse.deltaY;
+        xDelta += mouse.deltaX;
+
+        boolean flag = false;
+
+        if (sequence.get(0).equals(SequenceDirections.UP)) {
+            int textureId = minecraft.textureManager.getTextureId("/assets/brassandgunpowder/gui/arrows/up_arrow.png");
+            minecraft.textureManager.bindTexture(textureId);
+            minecraft.inGameHud.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
+
+            if (yDelta >= 25) {
+                flag = true;
+            }
+        } else if (sequence.get(0).equals(SequenceDirections.DOWN)) {
+            int textureId = minecraft.textureManager.getTextureId("/assets/brassandgunpowder/gui/arrows/down_arrow.png");
+            minecraft.textureManager.bindTexture(textureId);
+            minecraft.inGameHud.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
+
+            if (yDelta <= -25) {
+                flag = true;
+            }
+        } else if (sequence.get(0).equals(SequenceDirections.LEFT)) {
+            int textureId = minecraft.textureManager.getTextureId("/assets/brassandgunpowder/gui/arrows/left_arrow.png");
+            minecraft.textureManager.bindTexture(textureId);
+            minecraft.inGameHud.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
+
+            if (xDelta <= -25) {
+                flag = true;
+            }
+        } else if (sequence.get(0).equals(SequenceDirections.RIGHT)) {
+            int textureId = minecraft.textureManager.getTextureId("/assets/brassandgunpowder/gui/arrows/right_arrow.png");
+            minecraft.textureManager.bindTexture(textureId);
+            minecraft.inGameHud.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
+
+            if (xDelta >= 25) {
+                flag = true;
+            }
+        }
+
+        if (flag) {
+            yDelta = 0;
+            xDelta = 0;
+            sequence.remove(0);
+        }
+
+        if (sequence.isEmpty()) {
+            finishReloading(minecraft.player.inventory.getSelectedItem());
+        }
+    }
 
     public void startReloading(ItemStack stack) {
         isReloading = true;
         BaG.isReloading = true;
-        mouse.unlockCursor();
         setState(stack, reloadingState);
     }
     public void interruptReloading(ItemStack stack) {
         isReloading = false;
         BaG.isReloading = false;
-        mouse.lockCursor();
         setState(stack, emptyState);
     }
     public void finishReloading(ItemStack stack) {
         isReloading = false;
         BaG.isReloading = false;
-        mouse.lockCursor();
         stack.setDamage(0);
         setState(stack, loadedState);
     }
     public void shoot(ItemStack stack, World world, PlayerEntity user) {
         if ((stack.getDamage() == stack.getMaxDamage())) return;
+
         stack.damage(1, user);
         world.playSound(user, "random.bow", 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F));
         world.spawnEntity(new ArrowEntity(world, user));
+
         if ((stack.getDamage() == stack.getMaxDamage())) setState(stack, emptyState);
     }
     public void setState(ItemStack stack, String state) {

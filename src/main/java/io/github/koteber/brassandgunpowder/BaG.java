@@ -43,8 +43,8 @@ public class BaG {
 
     @EventListener
     public void registerItems(ItemRegistryEvent event) {
-        item_LEVER_SHOTGUN = new LeverShotgun(NAMESPACE.id("lever_shotgun"), 15).setTranslationKey(NAMESPACE, "lever_shotgun");
-        item_REVOLVER = new Revolver(NAMESPACE.id("revolver"), 6).setTranslationKey(NAMESPACE, "revolver");
+        item_LEVER_SHOTGUN = new LeverShotgun(NAMESPACE.id("lever_shotgun"), 15, 5).setTranslationKey(NAMESPACE, "lever_shotgun");
+        item_REVOLVER = new Revolver(NAMESPACE.id("revolver"), 6, 12).setTranslationKey(NAMESPACE, "revolver");
 
         items = new Item[]{
                 item_LEVER_SHOTGUN,

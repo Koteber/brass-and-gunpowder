@@ -1,8 +1,9 @@
 package io.github.koteber.brassandgunpowder.items;
 
-import com.mojang.datafixers.TypeRewriteRule;
 import io.github.koteber.brassandgunpowder.BaG;
-import io.github.koteber.brassandgunpowder.EventPoster;
+import io.github.koteber.brassandgunpowder.Bullet;
+import io.github.koteber.brassandgunpowder.Event.EventPoster;
+import io.github.koteber.brassandgunpowder.SequencePart;
 import net.glasslauncher.mods.gcapi3.mixin.client.MinecraftAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Mouse;
@@ -26,18 +27,18 @@ public abstract class WeaponBase extends TemplateItem {
     public boolean isReloading;
 
     public String emptyState = "empty";
-    public String reloadingState = "reloading";
     public String loadedState = "loaded";
 
-    public enum SequenceDirections {
-        LEFT, RIGHT, UP, DOWN;
-    }
-    public ArrayList<SequenceDirections> sequence = new ArrayList<>();
+    public ArrayList<SequencePart> sequence = new ArrayList<>();
 
     protected EventPoster poster = new EventPoster();
 
-    public WeaponBase(Identifier identifier, int _ammo) {
+
+    public int damage;
+
+    public WeaponBase(Identifier identifier, int _ammo, int damage) {
         super(identifier);
+        this.damage = damage;
         this.maxCount = 1;
         setMaxDamage(_ammo);
     }
@@ -53,44 +54,70 @@ public abstract class WeaponBase extends TemplateItem {
     }
 
     public void reloadHandler(float tickDelta, boolean screenOpen, int centerX, int centerY, int mouseX, int mouseY, Minecraft minecraft, CallbackInfo ci) {
+        if (minecraft.player.inventory.getSelectedItem().getItem() != this) return;
         if (!isReloading) return;
+        if (sequence.isEmpty()) return;
 
         yDelta += mouse.deltaY;
         xDelta += mouse.deltaX;
 
         boolean flag = false;
 
-        if (sequence.get(0).equals(SequenceDirections.UP)) {
+        if (sequence.get(0).direction.equals(SequencePart.SequenceDirections.UP)) {
             int textureId = minecraft.textureManager.getTextureId("/assets/brassandgunpowder/gui/arrows/up_arrow.png");
             minecraft.textureManager.bindTexture(textureId);
             minecraft.inGameHud.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
 
-            if (yDelta >= 25) {
+            yDelta -= Math.abs(xDelta/2);
+            xDelta = 0;
+
+            if (yDelta >= sequence.get(0).length) {
                 flag = true;
             }
-        } else if (sequence.get(0).equals(SequenceDirections.DOWN)) {
+            else if (yDelta < 0) {
+                yDelta = 0;
+            }
+        } else if (sequence.get(0).direction.equals(SequencePart.SequenceDirections.DOWN)) {
             int textureId = minecraft.textureManager.getTextureId("/assets/brassandgunpowder/gui/arrows/down_arrow.png");
             minecraft.textureManager.bindTexture(textureId);
             minecraft.inGameHud.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
 
-            if (yDelta <= -25) {
+            yDelta += Math.abs(xDelta/2);
+            xDelta = 0;
+
+            if (yDelta <= -sequence.get(0).length) {
                 flag = true;
             }
-        } else if (sequence.get(0).equals(SequenceDirections.LEFT)) {
+            else if (yDelta > 0) {
+                yDelta = 0;
+            }
+        } else if (sequence.get(0).direction.equals(SequencePart.SequenceDirections.LEFT)) {
             int textureId = minecraft.textureManager.getTextureId("/assets/brassandgunpowder/gui/arrows/left_arrow.png");
             minecraft.textureManager.bindTexture(textureId);
             minecraft.inGameHud.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
 
-            if (xDelta <= -25) {
+            xDelta += Math.abs(yDelta/2);
+            yDelta = 0;
+
+            if (xDelta <= -sequence.get(0).length) {
                 flag = true;
             }
-        } else if (sequence.get(0).equals(SequenceDirections.RIGHT)) {
+            else if (xDelta > 0) {
+                xDelta = 0;
+            }
+        } else if (sequence.get(0).direction.equals(SequencePart.SequenceDirections.RIGHT)) {
             int textureId = minecraft.textureManager.getTextureId("/assets/brassandgunpowder/gui/arrows/right_arrow.png");
             minecraft.textureManager.bindTexture(textureId);
             minecraft.inGameHud.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
 
-            if (xDelta >= 25) {
+            xDelta -= Math.abs(yDelta/2);
+            yDelta = 0;
+
+            if (xDelta >= sequence.get(0).length) {
                 flag = true;
+            }
+            else if (xDelta < 0) {
+                xDelta = 0;
             }
         }
 
@@ -101,36 +128,27 @@ public abstract class WeaponBase extends TemplateItem {
         }
 
         if (sequence.isEmpty()) {
-            poster.postEvent();
-            finishReloading(minecraft.player.inventory.getSelectedItem());
+            poster.postEvent(minecraft);
         }
     }
 
-    public void startReloading(ItemStack stack) {
+    public void startReloading() {
         isReloading = true;
         BaG.isReloading = true;
-        setState(stack, reloadingState);
     }
-    public void interruptReloading(ItemStack stack) {
+    public void interruptReloading() {
         sequence.clear();
         isReloading = false;
         BaG.isReloading = false;
-        setState(stack, emptyState);
-    }
-    public void finishReloading(ItemStack stack) {
-        isReloading = false;
-        BaG.isReloading = false;
-        stack.setDamage(0);
-        setState(stack, loadedState);
+        poster.removeAll();
     }
     public void shoot(ItemStack stack, World world, PlayerEntity user) {
         if ((stack.getDamage() == stack.getMaxDamage())) return;
 
         stack.damage(1, user);
         world.playSound(user, "random.bow", 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F));
-        world.spawnEntity(new ArrowEntity(world, user));
-
-        if ((stack.getDamage() == stack.getMaxDamage())) setState(stack, emptyState);
+        world.spawnEntity(new Bullet(world, user, 10, 0.25f, damage));
+        setState(stack, emptyState);
     }
     public void setState(ItemStack stack, String state) {
         stack.getStationNbt().putString("state", state);

@@ -1,19 +1,17 @@
 package io.github.koteber.brassandgunpowder.items;
 
 import io.github.koteber.brassandgunpowder.BaG;
-import io.github.koteber.brassandgunpowder.Event.Listener;
 import io.github.koteber.brassandgunpowder.SequencePart;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.modificationstation.stationapi.api.util.Identifier;
 
 public class Revolver extends WeaponBase {
-    public Revolver(Identifier identifier, int _ammo, int _damage) {
-        super(identifier, _ammo, _damage);
+    public Revolver(Identifier identifier, int ammo, float speed, int damage, float spread) {
+        super(identifier, ammo, speed, damage, spread);
     }
 
     private boolean debounce_reloadScreen;

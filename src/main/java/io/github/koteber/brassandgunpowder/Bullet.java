@@ -44,7 +44,7 @@ public class Bullet extends Entity {
         this.standingEyeHeight = 0.0F;
     }
 
-    public Bullet(World world, LivingEntity owner, float speed, float divergence, int damage) {
+    public Bullet(World world, LivingEntity owner, float speed, int damage, float spread) {
         super(world);
         this.damage = damage;
         this.owner = owner;
@@ -59,7 +59,7 @@ public class Bullet extends Entity {
         this.velocityX = (double)(-MathHelper.sin(this.yaw / 180.0F * (float)Math.PI) * MathHelper.cos(this.pitch / 180.0F * (float)Math.PI));
         this.velocityZ = (double)(MathHelper.cos(this.yaw / 180.0F * (float)Math.PI) * MathHelper.cos(this.pitch / 180.0F * (float)Math.PI));
         this.velocityY = (double)(-MathHelper.sin(this.pitch / 180.0F * (float)Math.PI));
-        this.setVelocity(this.velocityX, this.velocityY, this.velocityZ, speed, divergence);
+        this.setVelocity(this.velocityX, this.velocityY, this.velocityZ, speed, spread);
     }
 
     protected void initDataTracker() {
@@ -177,7 +177,7 @@ public class Bullet extends Entity {
 
             if (var3 != null) {
                 if (var3.entity != null) {
-                    if (var3.entity.damage(this.owner, Math.toIntExact(damage))) {
+                    if (var3.entity.damage(this.owner, (int)damage)) {
                         this.world.playSound(this, "random.drr", 1.0F, 1.2F / (this.random.nextFloat() * 0.2F + 0.9F));
                         this.markDead();
                     } else {

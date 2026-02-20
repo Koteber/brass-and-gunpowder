@@ -34,13 +34,20 @@ public abstract class WeaponBase extends TemplateItem {
     protected EventPoster poster = new EventPoster();
 
 
-    public int damage;
+    public float ammo;
+    public float proj_speed;
+    public int proj_damage;
+    public float proj_spread;
 
-    public WeaponBase(Identifier identifier, int _ammo, int damage) {
+
+    public WeaponBase(Identifier identifier, int ammo, float speed, int damage, float spread) {
         super(identifier);
-        this.damage = damage;
+        this.ammo = ammo;
+        proj_speed = speed;
+        proj_damage = damage;
+        proj_spread = spread;
         this.maxCount = 1;
-        setMaxDamage(_ammo);
+        setMaxDamage(ammo);
     }
 
     @Override
@@ -68,7 +75,7 @@ public abstract class WeaponBase extends TemplateItem {
             minecraft.textureManager.bindTexture(textureId);
             minecraft.inGameHud.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
 
-            yDelta -= Math.abs(xDelta/2);
+            yDelta -= Math.abs(xDelta);
             xDelta = 0;
 
             if (yDelta >= sequence.get(0).length) {
@@ -82,7 +89,7 @@ public abstract class WeaponBase extends TemplateItem {
             minecraft.textureManager.bindTexture(textureId);
             minecraft.inGameHud.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
 
-            yDelta += Math.abs(xDelta/2);
+            yDelta += Math.abs(xDelta);
             xDelta = 0;
 
             if (yDelta <= -sequence.get(0).length) {
@@ -96,7 +103,7 @@ public abstract class WeaponBase extends TemplateItem {
             minecraft.textureManager.bindTexture(textureId);
             minecraft.inGameHud.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
 
-            xDelta += Math.abs(yDelta/2);
+            xDelta += Math.abs(yDelta);
             yDelta = 0;
 
             if (xDelta <= -sequence.get(0).length) {
@@ -110,7 +117,7 @@ public abstract class WeaponBase extends TemplateItem {
             minecraft.textureManager.bindTexture(textureId);
             minecraft.inGameHud.drawTexture(centerX - 128, centerY - 128, 0, 0, 256, 256);
 
-            xDelta -= Math.abs(yDelta/2);
+            xDelta -= Math.abs(yDelta);
             yDelta = 0;
 
             if (xDelta >= sequence.get(0).length) {
@@ -147,7 +154,7 @@ public abstract class WeaponBase extends TemplateItem {
 
         stack.damage(1, user);
         world.playSound(user, "random.bow", 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F));
-        world.spawnEntity(new Bullet(world, user, 10, 0.25f, damage));
+        world.spawnEntity(new Bullet(world, user, proj_speed, proj_damage, proj_spread));
         setState(stack, emptyState);
     }
     public void setState(ItemStack stack, String state) {

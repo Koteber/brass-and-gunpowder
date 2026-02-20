@@ -6,15 +6,14 @@ import io.github.koteber.brassandgunpowder.SequencePart;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.modificationstation.stationapi.api.util.Identifier;
 import java.awt.*;
 
 public class LeverShotgun extends WeaponBase {
-    public LeverShotgun(Identifier identifier, int _ammo, int _damage) {
-        super(identifier, _ammo, _damage);
+    public LeverShotgun(Identifier identifier, int ammo, float speed, int damage, float spread) {
+        super(identifier, ammo, speed, damage, spread);
     }
 
     private boolean debounce_reloadScreen;
@@ -50,11 +49,11 @@ public class LeverShotgun extends WeaponBase {
 
         stack.damage(1, user);
         world.playSound(user, "random.bow", 1.0F, 1.0F / (random.nextFloat() * 0.4F + 0.8F));
-        world.spawnEntity(new Bullet(world, user, 5, 3, damage));
-        world.spawnEntity(new Bullet(world, user, 5, 3, damage));
-        world.spawnEntity(new Bullet(world, user, 5, 3, damage));
-        world.spawnEntity(new Bullet(world, user, 5, 3, damage));
-        world.spawnEntity(new Bullet(world, user, 5, 3, damage));
+        world.spawnEntity(new Bullet(world, user, proj_speed, proj_damage, proj_spread));
+        world.spawnEntity(new Bullet(world, user, proj_speed, proj_damage, proj_spread));
+        world.spawnEntity(new Bullet(world, user, proj_speed, proj_damage, proj_spread));
+        world.spawnEntity(new Bullet(world, user, proj_speed, proj_damage, proj_spread));
+        world.spawnEntity(new Bullet(world, user, proj_speed, proj_damage, proj_spread));
         setState(stack, emptyState);
     }
 

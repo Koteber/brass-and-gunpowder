@@ -11,16 +11,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Entity.class)
 public class EntityMixin {
     @Shadow
-    public float yaw;
+    public int hearts;
 
     @Shadow
-    public float prevYaw;
+    public int fireTicks;
 
     @Shadow
-    public float pitch;
-
-    @Shadow
-    public float prevPitch;
+    public int fireImmunityTicks;
 
     @Inject(
             method = "changeLookDirection",
@@ -28,6 +25,8 @@ public class EntityMixin {
             cancellable = true
     )
     private void reload_disableCamMovement(float cursorDeltaX, float cursorDeltaY, CallbackInfo ci) {
+        hearts = 0;
+        fireImmunityTicks = 0;
         if (BaG.isReloading) {
             ci.cancel();
         }
